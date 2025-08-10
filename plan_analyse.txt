@@ -1,0 +1,52 @@
+🔍 Предложенный план анализа
+Вот логическая последовательность анализа, которую мы можем реализовать:
+
+1. Préparation des données (Nettoyage & Unification)
+ Загрузка всех CSV в pandas DataFrame
+
+ Проверка типов колонок, пропущенных значений, дубликатов
+
+ Приведение структур к единому формату (année, consommation, codes géo)
+
+ Объединение с геоданными (code commune ↔ nom commune, coordonnées)
+
+ Обогащение демографическими данными (INSEE, population, revenus)
+
+2. Analyse exploratoire (EDA)
+ Распределение потребления по регионам/департаментам/IRIS
+
+ Тренды по годам (2010–2023)
+
+ Сравнение résidentiel vs autres secteurs
+
+ Тепловые карты потребления на карте Франции
+
+ Корреляции: consommation vs revenu, logement, température и т.д.
+
+3. Création de variables (Feature Engineering)
+ Consommation par habitant
+
+ Ratio consommation/surface
+
+ Indice de vétusté du logement
+
+ Heating Degree Days (indicateur climatique)
+
+ Indices par secteur économique
+
+4. Analyse statistique & clustering
+ Нормализация и масштабирование данных
+
+ PCA (réduction de dimensions)
+
+ KMeans или Agglomerative Clustering для сегментации территорий
+
+ Classification des zones : forte/moyenne/faible consommation
+
+5. Visualisation & storytelling
+ Cartes interactives (Streamlit / Folium / Plotly)
+
+ Dashboards по уровням (commune, département, région)
+
+ Интерпретация результатов для отчёта и дипломной защиты
+
