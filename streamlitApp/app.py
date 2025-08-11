@@ -60,6 +60,15 @@ def add_conso_par_hab(df: pd.DataFrame, total_col="conso_totale_mwh", pop_col="n
         df.loc[mask, "conso_par_habitant"] = df.loc[mask, total_col] / df.loc[mask, pop_col]
     return df
 
+def filter_nonempty_numeric(gdf: gpd.GeoDataFrame, col: str) -> gpd.GeoDataFrame:
+    if col not in gdf.columns:
+        return gdf.iloc[0:0]  # пусто, чтобы не рисовать все
+    # числовое + не NaN + > 0
+    gdf = gdf.copy()
+    gdf[col] = pd.to_numeric(gdf[col], errors="coerce")
+    return gdf[gdf[col].notna() & (gdf[col] > 0)]
+
+
 def parse_geo_point_2d(val):
     if pd.isna(val): return pd.Series([None, None])
     try:
@@ -243,16 +252,20 @@ elif section == "enedis commune":
     if not code_col:
         st.warning("В CSV нет колонки 'code_commune'.")
         st.stop()
+
+    # нормализуем коды коммун и агрегируем по выбранной метрике (total/per capita)
     df[code_col] = df[code_col].apply(lambda x: normalize_code(x, width=5))
-    agg = df.groupby(code_col, as_index=False)[value_col].sum()
+    agg = df.groupby(code_col, as_index=False)[value_col].sum(min_count=1)  # sum по NaN даст NaN
 
     gdf = load_gpkg_layer("commune")
     key_geo = "code_insee" if "code_insee" in gdf.columns else gdf.columns[0]
     gdf_merge = gdf.merge(agg, left_on=key_geo, right_on=code_col, how="left")
 
-    # как просил: на карте — только коммуны с ненулевым total
-    if value_col == "conso_totale_mwh":
-        gdf_merge = gdf_merge[gdf_merge[value_col].notna() & (gdf_merge[value_col] > 0)]
+    # РИСУЕМ ТОЛЬКО ТЕ КОММУНЫ, ГДЕ ЕСТЬ НЕ НУЛЕВОЕ ЗНАЧЕНИЕ ВЫБРАННОЙ МЕТРИКИ
+    gdf_merge = filter_nonempty_numeric(gdf_merge, value_col)
+    if gdf_merge.empty:
+        st.warning("Нет коммун с ненулевым значением выбранной метрики для текущих фильтров.")
+        st.stop()
 
     st.subheader("🗺️ Карта по коммунам")
     folium_choropleth(
