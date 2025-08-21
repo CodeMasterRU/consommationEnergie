@@ -7,8 +7,8 @@ from folium.plugins import MarkerCluster
 # === 1. Загрузка данных ===
 
 # Путь к файлам
-commune_data_path = "./DataEnedis10_000/enedis_commune_data.csv"
-commune_geo_path = "20230823-communes-departement-region.csv"
+commune_data_path = "./streamlitApp/data/enedis_commune_data.csv"
+commune_geo_path = "./streamlitApp/data/20230823-communes-departement-region.csv"
 
 # Загрузка
 enedis_df = pd.read_csv(commune_data_path)

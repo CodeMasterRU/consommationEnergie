@@ -44,8 +44,8 @@ PROD_CANDIDATES = [
     "Evolution de la production d'electricite en France.csv",
     "evolution_production_france.csv",
     "production_france.csv",
-    "eco2mix_production_france.csv",
 ]
+
 PROD_FALLBACK = ["*production*.csv", "*Évolution*production*.csv", "*evolution*production*.csv"]
 PROD_PATH = _find_csv(PROD_CANDIDATES, PROD_FALLBACK)
 
@@ -93,6 +93,7 @@ def load_park_csv(path: str) -> pd.DataFrame:
         "Puissance installée (GW)": "gw",
         "Nature": "nature",
     }
+    
     for k, v in list(rename.items()):
         if k in df.columns:
             df = df.rename(columns={k: v})
