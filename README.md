@@ -46,6 +46,7 @@ uvicorn api.main:app --reload
 http://localhost:8000/docs
 
 ### 📂 Structure du projet
+```bash
 consommationEnergie/
 │── streamlitApp/            # Interface utilisateur (visualisations)
 │── api/                     # API (FastAPI)
@@ -55,7 +56,7 @@ consommationEnergie/
 │── data/                    # Données CSV (EPCI, départements, régions)
 │── README.md                # Documentation technique
 │── guide_utilisateurs.md    # Guide d’utilisation (non technique)
-
+```
 ### 📈 Analyses intégrées
 
  #### Régressions linéaires et multiples (influence du climat, chauffage, âge du logement).
