@@ -15,7 +15,7 @@ L’outil permet de :
 ## ⚙️ Installation
 
 ### 1. Cloner le projet
-```bash
+
 git clone https://github.com/votre_repo/consommationEnergie.git
 cd consommationEnergie
 
@@ -56,18 +56,18 @@ consommationEnergie/
 │── README.md                # Documentation technique
 │── guide_utilisateurs.md    # Guide d’utilisation (non technique)
 
-###📈 Analyses intégrées
+### 📈 Analyses intégrées
 
-Régressions linéaires et multiples (influence du climat, chauffage, âge du logement).
+ # Régressions linéaires et multiples (influence du climat, chauffage, âge du logement).
 
-Tests du χ² (liens entre variables catégorielles).
+ # Tests du χ² (liens entre variables catégorielles).
 
-Indicateurs principaux :
+ # Indicateurs principaux :
 
-consommation par habitant,
+- consommation par habitant,
 
-DJU (degrés-jours unifiés, indicateur climatique),
+- DJU (degrés-jours unifiés, indicateur climatique),
 
-indice d’âge du logement,
+- indice d’âge du logement,
 
-taux de chauffage électrique.
+- taux de chauffage électrique.
