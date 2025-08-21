@@ -45,7 +45,7 @@ uvicorn api.main:app --reload
 ➡️ Documentation interactive disponible via Swagger/OpenAPI :
 http://localhost:8000/docs
 
-###📂 Structure du projet
+### 📂 Structure du projet
 consommationEnergie/
 │── streamlitApp/            # Interface utilisateur (visualisations)
 │── api/                     # API (FastAPI)
@@ -58,11 +58,11 @@ consommationEnergie/
 
 ### 📈 Analyses intégrées
 
- # Régressions linéaires et multiples (influence du climat, chauffage, âge du logement).
+ #### Régressions linéaires et multiples (influence du climat, chauffage, âge du logement).
 
- # Tests du χ² (liens entre variables catégorielles).
+ #### Tests du χ² (liens entre variables catégorielles).
 
- # Indicateurs principaux :
+ #### Indicateurs principaux :
 
 - consommation par habitant,
 
