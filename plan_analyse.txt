@@ -50,3 +50,10 @@
 
  Интерпретация результатов для отчёта и дипломной защиты
 
+
+usename : mynameisvitos_db_user
+пароль базы данных: Js0dbrEgIWOAVnak
+
+mongodb+srv://mynameisvitos_db_user:Js0dbrEgIWOAVnak@energy-fr-cluster.ijkewy2.mongodb.net/
+
+mongodb+srv://mynameisvitos_db_user:Js0dbrEgIWOAVnak@energy-fr-cluster.ijkewy2.mongodb.net/
