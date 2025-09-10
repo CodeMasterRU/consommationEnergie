@@ -41,7 +41,7 @@ async def list_iris(
     code_grand_secteur: Optional[str] = Query(None),
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    sort: Optional[str] = Query(None, description="Напр.: 'annee,-conso_totale_mwh'"),
+    sort: Optional[str] = Query(None, description="Exemple: 'annee,-conso_totale_mwh'"),
 ):
     ands: List[Dict[str, Any]] = []
     if annee is not None: ands.append({"annee": annee})
@@ -107,9 +107,9 @@ ALLOWED_DISTINCT_FIELDS = {
 }
 
 @router.get("/distinct", response_model=List[Any])
-async def distinct_values(field: str = Query(..., description="напр.: code_iris | code_commune | code_region | ...")):
+async def distinct_values(field: str = Query(..., description="exemple: code_iris | code_commune | code_region | ...")):
     if field not in ALLOWED_DISTINCT_FIELDS:
-        raise HTTPException(status_code=400, detail=f"Недопустимое поле '{field}'")
+        raise HTTPException(status_code=400, detail=f"data invalid '{field}'")
     vals = await db[COLL_IRIS].distinct(field)
     return sorted([v for v in vals if v is not None], key=lambda x: str(x))
 
@@ -130,7 +130,7 @@ async def count_iris(
 
 # ---------- BY KEY (annee + code_iris) ----------
 @router.get("/by_key/{annee}/{code_iris}", response_model=IrisOut)
-async def get_by_key(annee: int, code_iris: str = Path(..., description="число или строка")):
+async def get_by_key(annee: int, code_iris: str = Path(..., description="nombre ou ligne")):
     doc = await db[COLL_IRIS].find_one({
         "annee": annee,
         "$or": [{"code_iris": code_iris}, {"code_iris": _num_or_str(code_iris)}],

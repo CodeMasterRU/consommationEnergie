@@ -42,11 +42,11 @@ async def debug_one():
 # ---------- LIST ----------
 @router.get("", response_model=List[EvoParcOut])
 async def list_installed_capacity(
-    year: Optional[int] = Query(None, description="Год (поле Date)"),
+    year: Optional[int] = Query(None, description="Année (champ Date)"),
     filiere: Optional[str] = Query(None),
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    sort: Optional[str] = Query(None, description="Напр.: year,-valeur_gw или имена полей БД"),
+    sort: Optional[str] = Query(None, description="Exemple: year,-valeur_gw или имена полей БД"),
 ):
     q: Dict[str, Any] = {}
     if year is not None:
@@ -94,7 +94,7 @@ async def distinct_values(field: str = Query(..., description="Date | Filière")
     # поддержим короткие имена
     field = _dbf(field)
     if field not in ALLOWED_DISTINCT_FIELDS:
-        raise HTTPException(status_code=400, detail=f"Недопустимое поле '{field}'")
+        raise HTTPException(status_code=400, detail=f"Invalid Data '{field}'")
     vals = await db[COLL_EVOL_PARC].distinct(field)
     return sorted([v for v in vals if v is not None], key=lambda x: str(x))
 

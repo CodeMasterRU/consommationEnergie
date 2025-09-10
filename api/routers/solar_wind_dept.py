@@ -58,7 +58,7 @@ def _range_filter(min_v: Optional[float], max_v: Optional[float]) -> Optional[Di
 
 
 # ---------- DEBUG ----------
-@router.get("/debug/one", response_model=SolarWindOut, summary="Любая запись (для проверки)")
+@router.get("/debug/one", response_model=SolarWindOut, summary="Toute entrée (pour vérification)")
 async def debug_one():
     doc = await db[COLL_SW].find_one({})
     if not doc:
@@ -66,22 +66,22 @@ async def debug_one():
     return _to_str_id(doc)
 
 
-@router.get("/_debug", summary="Debug: кол-во документов")
+@router.get("/_debug", summary="Debug: nombre de documents")
 async def _debug():
     n = await db[COLL_SW].count_documents({})
     return {"collection": COLL_SW, "count": n}
 
 
 # ---------- LIST ----------
-@router.get("", response_model=List[SolarWindOut], summary="Список установок по департаментам")
+@router.get("", response_model=List[SolarWindOut], summary="Liste des installations par département")
 async def list_sw(
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    sort: Optional[str] = Query(None, description="например: filiere,-valeur_mw или 'Filière,-Valeur (MW)'"),
-    departement: Optional[str] = Query(None, description="Название департамента (точное совпадение)"),
+    sort: Optional[str] = Query(None, description="Exemple: filiere,-valeur_mw или 'Filière,-Valeur (MW)'"),
+    departement: Optional[str] = Query(None, description="Nom du département (correspondance exacte)"),
     filiere: Optional[str] = Query(None, description="Solaire | Éolien"),
-    valeur_min: Optional[float] = Query(None, description="Мин. значение MW"),
-    valeur_max: Optional[float] = Query(None, description="Макс. значение MW"),
+    valeur_min: Optional[float] = Query(None, description="Valeur minimale en MW"),
+    valeur_max: Optional[float] = Query(None, description="Valeur maximale en MW"),
 ):
     q: Dict[str, Any] = {}
     if departement:
@@ -102,7 +102,7 @@ async def list_sw(
 
 
 # ---------- SAMPLE ----------
-@router.get("/sample", response_model=List[SolarWindOut], summary="N примеров (быстрый просмотр)")
+@router.get("/sample", response_model=List[SolarWindOut], summary="N exemples (aperçu rapide)")
 async def sample_sw(
     limit: int = Query(3, ge=1, le=50),
     departement: Optional[str] = None,
@@ -119,16 +119,16 @@ async def sample_sw(
 
 
 # ---------- DISTINCT ----------
-@router.get("/distinct", response_model=List[str], summary="Уникальные значения поля")
+@router.get("/distinct", response_model=List[str], summary="Valeurs de champ data uniques")
 async def distinct_sw(field: str = Query(..., description="departement | filiere")):
     if field not in ALLOWED_DISTINCT_FIELDS:
-        raise HTTPException(status_code=400, detail=f"Недопустимое поле '{field}'")
+        raise HTTPException(status_code=400, detail=f"Champ invalide '{field}'")
     vals = await db[COLL_SW].distinct(F[field])
     return sorted([v for v in vals if v is not None], key=lambda x: str(x))
 
 
 # ---------- COUNT ----------
-@router.get("/count", summary="Сколько документов по фильтру")
+@router.get("/count", summary="Combien y a-t-il de documents par filtre ?")
 async def count_sw(
     departement: Optional[str] = None,
     filiere: Optional[str] = None,
@@ -149,7 +149,7 @@ async def count_sw(
 
 
 # ---------- GET BY _id ----------
-@router.get("/{doc_id}", response_model=SolarWindOut, summary="Документ по ObjectId")
+@router.get("/{doc_id}", response_model=SolarWindOut, summary="Document par ObjectId")
 async def get_sw(doc_id: str = Path(..., description="Mongo ObjectId (24 hex)")):
     try:
         _id = ObjectId(doc_id)
@@ -162,7 +162,7 @@ async def get_sw(doc_id: str = Path(..., description="Mongo ObjectId (24 hex)"))
 
 
 # ---------- CREATE ----------
-@router.post("", response_model=SolarWindOut, status_code=201, summary="Создать запись")
+@router.post("", response_model=SolarWindOut, status_code=201, summary="Créer un article")
 async def create_sw(payload: SolarWindIn):
     data = payload.model_dump(exclude_none=True, by_alias=True)  # пишем ключами из Mongo
     res = await db[COLL_SW].insert_one(data)
@@ -171,7 +171,7 @@ async def create_sw(payload: SolarWindIn):
 
 
 # ---------- BULK INSERT ----------
-@router.post("/bulk", response_model=List[SolarWindOut], status_code=201, summary="Массовая загрузка")
+@router.post("/bulk", response_model=List[SolarWindOut], status_code=201, summary="Update par lots")
 async def bulk_insert_sw(items: List[SolarWindIn]):
     if not items:
         return []
@@ -182,7 +182,7 @@ async def bulk_insert_sw(items: List[SolarWindIn]):
 
 
 # ---------- PATCH ----------
-@router.patch("/{doc_id}", response_model=SolarWindOut, summary="Обновить запись")
+@router.patch("/{doc_id}", response_model=SolarWindOut, summary="Update partiel")
 async def update_sw(doc_id: str, payload: SolarWindUpdate):
     try:
         _id = ObjectId(doc_id)
@@ -199,7 +199,7 @@ async def update_sw(doc_id: str, payload: SolarWindUpdate):
 
 
 # ---------- DELETE ----------
-@router.delete("/{doc_id}", status_code=204, summary="Удалить запись")
+@router.delete("/{doc_id}", status_code=204, summary="Suppresion")
 async def delete_sw(doc_id: str):
     try:
         _id = ObjectId(doc_id)

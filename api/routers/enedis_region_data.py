@@ -39,10 +39,10 @@ async def debug_one():
 async def list_regions(
     annee: Optional[int] = Query(None),
     code_region: Optional[str] = Query(None),
-    nom_region: Optional[str] = Query(None, description="Фильтр по названию региона (точное совпадение)"),
+    nom_region: Optional[str] = Query(None, description="Filtrer par nom de région (correspondance exacte)"),
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    sort: Optional[str] = Query(None, description="Напр.: 'annee,-conso_totale_mwh'"),
+    sort: Optional[str] = Query(None, description="Exemple: 'annee,-conso_totale_mwh'"),
 ):
     # конструируем AND из переданных фильтров
     and_clauses: List[Dict[str, Any]] = []
@@ -101,7 +101,7 @@ async def sample_regions(
 # ---------- DISTINCT ----------
 @router.get("/distinct")
 async def distinct(field: str):
-    """Вернёт список уникальных значений поля (annee, code_region, nom_region, ...)."""
+    """Renvoie une liste de valeurs uniques pour le champ (annee, code_region, nom_region, ...)."""
     vals = await db[COLL_REGION].distinct(field)
     # убираем None и сортируем как строки для стабильного вывода
     return sorted([v for v in vals if v is not None], key=lambda x: str(x))
@@ -129,7 +129,7 @@ async def count_regions(
 
 # ---------- BY KEY (annee + code_region) ----------
 @router.get("/by_key/{annee}/{code_region}", response_model=RegionOut)
-async def get_by_key(annee: int, code_region: str = Path(..., description="Код региона (число или строка)")):
+async def get_by_key(annee: int, code_region: str = Path(..., description="Code de région (numéro ou ligne)")):
     doc = await db[COLL_REGION].find_one({
         "annee": annee,
         "$or": [{"code_region": code_region}, {"code_region": _num_or_str(code_region)}],

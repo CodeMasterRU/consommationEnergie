@@ -41,27 +41,27 @@ def _to_str_id(doc: Dict[str, Any]) -> Dict[str, Any]:
 
 
 # -------- DEBUG --------
-@router.get("/debug/one", response_model=MajorInstallOut, summary="Любая запись без фильтров")
+@router.get("/debug/one", response_model=MajorInstallOut, summary="Toute entrée sans filtres")
 async def debug_one():
     doc = await db[COLL_MAJOR].find_one({})
     if not doc:
         raise HTTPException(status_code=404, detail="Collection is empty")
     return _to_str_id(doc)
 
-@router.get("/_debug", summary="Техническая проверка: размер коллекции")
+@router.get("/_debug", summary="Contrôle technique : taille de la collection")
 async def _debug():
     n = await db[COLL_MAJOR].count_documents({})
     return {"collection": COLL_MAJOR, "count": n}
 
 
 # -------- LIST --------
-@router.get("", response_model=List[MajorInstallOut], summary="Список крупных установок с фильтрами")
+@router.get("", response_model=List[MajorInstallOut], summary="Liste des grandes installations avec filtres")
 async def list_major_installs(
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    sort: Optional[str] = Query(None, description="Например: filiere,-valeur_mw (или оригинальные имена полей)"),
-    departement: Optional[str] = Query(None, description="Имя площадки (в данных хранится в поле «Département»)"),
-    filiere: Optional[str] = Query(None, description="Например: Nucléaire | Hydraulique | Gaz ..."),
+    sort: Optional[str] = Query(None, description="Ex: filiere,-valeur_mw (ou noms de champs originaux)"),
+    departement: Optional[str] = Query(None, description="Nom d'installation (stocké dans les données du champ « Département »)"),
+    filiere: Optional[str] = Query(None, description="Ex: Nucléaire | Hydraulique | Gaz ..."),
 ):
     q: Dict[str, Any] = {}
     if departement:
@@ -89,7 +89,7 @@ async def list_major_installs(
 
 
 # -------- SAMPLE --------
-@router.get("/sample", response_model=List[MajorInstallOut], summary="N примеров (быстрый просмотр)")
+@router.get("/sample", response_model=List[MajorInstallOut], summary="N exemples (aperçu rapide)")
 async def sample_major_installs(
     limit: int = Query(3, ge=1, le=50),
     departement: Optional[str] = None,
@@ -106,18 +106,18 @@ async def sample_major_installs(
 
 
 # -------- DISTINCT --------
-@router.get("/distinct", summary="Уникальные значения поля")
-async def distinct_values(field: str = Query(..., description="Примеры: departement | filiere | valeur_mw (или оригинальные имена)")):
+@router.get("/distinct", summary="Valeurs de champ uniques")
+async def distinct_values(field: str = Query(..., description="Exemples: departement | filiere | valeur_mw (ou noms originaux)")):
     # Разрешаем как «дружелюбные», так и оригинальные имена
     if field not in ALLOWED_DISTINCT_FIELDS:
-        raise HTTPException(status_code=400, detail=f"Недопустимое поле: {field}")
+        raise HTTPException(status_code=400, detail=f"Champ invalide: {field}")
     real_field = _db_field(field)
     vals = await db[COLL_MAJOR].distinct(real_field)
     return sorted([v for v in vals if v is not None], key=lambda x: str(x))
 
 
 # -------- COUNT --------
-@router.get("/count", summary="Сколько документов по фильтру")
+@router.get("/count", summary="Combien y a-t-il de documents par filtre ?")
 async def count_major_installs(
     departement: Optional[str] = None,
     filiere: Optional[str] = None,
@@ -133,8 +133,8 @@ async def count_major_installs(
 
 
 # -------- BY _id --------
-@router.get("/{doc_id}", response_model=MajorInstallOut, summary="Документ по ObjectId")
-async def get_by_id(doc_id: str = Path(..., description="24-символьный ObjectId")):
+@router.get("/{doc_id}", response_model=MajorInstallOut, summary="Document sur ObjectId")
+async def get_by_id(doc_id: str = Path(..., description="24 caractères ObjectId")):
     try:
         _id = ObjectId(doc_id)
     except Exception:
@@ -147,7 +147,7 @@ async def get_by_id(doc_id: str = Path(..., description="24-символьный
 
 
 # -------- CREATE --------
-@router.post("", response_model=MajorInstallOut, status_code=201, summary="Создать запись")
+@router.post("", response_model=MajorInstallOut, status_code=201, summary="Créer un article")
 async def create_major_install(payload: MajorInstallIn):
     res = await db[COLL_MAJOR].insert_one(payload.model_dump(by_alias=True, exclude_none=True))
     doc = await db[COLL_MAJOR].find_one({"_id": res.inserted_id})
@@ -155,7 +155,7 @@ async def create_major_install(payload: MajorInstallIn):
 
 
 # -------- BULK INSERT --------
-@router.post("/bulk", response_model=List[MajorInstallOut], status_code=201, summary="Пакетная загрузка")
+@router.post("/bulk", response_model=List[MajorInstallOut], status_code=201, summary="Update par lots")
 async def bulk_insert(items: List[MajorInstallIn]):
     if not items:
         return []
@@ -166,7 +166,7 @@ async def bulk_insert(items: List[MajorInstallIn]):
 
 
 # -------- PATCH --------
-@router.patch("/{doc_id}", response_model=MajorInstallOut, summary="Частичное обновление")
+@router.patch("/{doc_id}", response_model=MajorInstallOut, summary="Update partiel")
 async def update_major_install(doc_id: str, payload: MajorInstallUpdate):
     try:
         _id = ObjectId(doc_id)
@@ -184,7 +184,7 @@ async def update_major_install(doc_id: str, payload: MajorInstallUpdate):
 
 
 # -------- DELETE --------
-@router.delete("/{doc_id}", status_code=204, summary="Удаление")
+@router.delete("/{doc_id}", status_code=204, summary="Suppresion")
 async def delete_major_install(doc_id: str):
     try:
         _id = ObjectId(doc_id)

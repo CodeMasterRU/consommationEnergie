@@ -36,11 +36,11 @@ async def debug_one():
 async def list_prod_fr(
     filiere: Optional[str] = Query(None),
     nature: Optional[str] = Query(None),
-    date: Optional[str] = Query(None, description="Фильтр по точной дате (YYYY или YYYY-MM)"),
-    annee: Optional[int] = Query(None, description="Год: отфильтрует Date по префиксу ^YYYY"),
+    date: Optional[str] = Query(None, description="Filtrer par date exacte (AAAA ou AAAA-MM)"),
+    annee: Optional[int] = Query(None, description="Année : filtrera la date par préfixe ^AAAA"),
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    sort: Optional[str] = Query(None, description="напр.: 'Date,-Valeur (TWh)' (по исходным именам или alias)"),
+    sort: Optional[str] = Query(None, description="ex.: 'Date,-Valeur (TWh)' (par noms d'origine ou alias)"),
 ):
     q: Dict[str, Any] = {}
     if filiere: q[K_FILIERE] = filiere
@@ -94,7 +94,7 @@ _ALLOWED_DISTINCT = {"date", "filiere", "nature", "annee"}
 @router.get("/distinct", response_model=List[Any])
 async def distinct_values(field: str = Query(..., description="date|filiere|nature|annee")):
     if field not in _ALLOWED_DISTINCT:
-        raise HTTPException(status_code=400, detail=f"Недопустимое поле '{field}'")
+        raise HTTPException(status_code=400, detail=f"Data invalid'{field}'")
 
     if field == "date":
         vals = await db[COLL_PROD_FR].distinct(K_DATE)
