@@ -38,7 +38,7 @@ def _to_str_id(doc: Dict[str, Any]) -> Dict[str, Any]:
 
 
 # ---------- DEBUG ----------
-@router.get("/debug/one", summary="Любая запись без фильтров", response_model=EPCIOut)
+@router.get("/debug/one", summary="Toute entrée sans filtres", response_model=EPCIOut)
 async def debug_one():
     doc = await db[COLL_EPCI].find_one({})
     if not doc:
@@ -52,11 +52,11 @@ async def _debug():
 
 
 # ---------- LIST ----------
-@router.get("/", summary="Список EPCI с фильтрами", response_model=List[EPCIOut])
+@router.get("/", summary="Liste des EPCI avec filtres", response_model=List[EPCIOut])
 async def list_epci(
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    sort: Optional[str] = Query(None, description="например: annee,-conso_totale_mwh"),
+    sort: Optional[str] = Query(None, description="exemple: annee,-conso_totale_mwh"),
     annee: Optional[int] = Query(None),
     code_region: Optional[str] = Query(None),
     code_departement: Optional[str] = Query(None),
@@ -91,7 +91,7 @@ async def list_epci(
 
 
 # ---------- SAMPLE ----------
-@router.get("/sample", summary="N примеров (быстрый просмотр)", response_model=List[EPCIOut])
+@router.get("/sample", summary="N exemples (aperçu rapide)", response_model=List[EPCIOut])
 async def sample(
     limit: int = Query(3, ge=1, le=50),
     annee: Optional[int] = Query(None),
@@ -115,16 +115,16 @@ async def sample(
 
 
 # ---------- DISTINCT ----------
-@router.get("/distinct", summary="Уникальные значения поля", response_model=List[Any])
+@router.get("/distinct", summary="Valeurs de champ uniques", response_model=List[Any])
 async def distinct_values(
-    field: str = Query(..., description="например: annee | code_region | code_epci | nom_epci ..."),
+    field: str = Query(..., description="exemple: annee | code_region | code_epci | nom_epci ..."),
     annee: Optional[int] = None,
     code_region: Optional[str] = None,
     code_departement: Optional[str] = None,
     code_epci: Optional[str] = None,
 ):
     if field not in ALLOWED_DISTINCT_FIELDS:
-        raise HTTPException(status_code=400, detail=f"Недопустимое поле '{field}'")
+        raise HTTPException(status_code=400, detail=f"Champ invalide '{field}'")
 
     ands: List[Dict[str, Any]] = []
     if annee is not None:
@@ -149,7 +149,7 @@ async def distinct_values(
 
 
 # ---------- COUNT ----------
-@router.get("/count", summary="Сколько документов по фильтру")
+@router.get("/count", summary="Combien y a-t-il de documents par filtre ?")
 async def count_docs(
     annee: Optional[int] = None,
     code_region: Optional[str] = None,
@@ -173,7 +173,7 @@ async def count_docs(
 
 # ---------- BY KEY (annee + code_epci) ----------
 @router.get("/by_key/{annee}/{code_epci}", response_model=EPCIOut)
-async def get_by_key(annee: int, code_epci: str = Path(..., description="Код EPCI (число или строка)")):
+async def get_by_key(annee: int, code_epci: str = Path(..., description="Code EPCI (numéro ou chaîne)")):
     doc = await db[COLL_EPCI].find_one({
         "annee": annee,
         "$or": [{"code_epci": code_epci}, {"code_epci": _num_or_str(code_epci)}],
@@ -184,7 +184,7 @@ async def get_by_key(annee: int, code_epci: str = Path(..., description="Код 
 
 
 # ---------- GET BY _id ----------
-@router.get("/{doc_id}", response_model=EPCIOut, summary="Документ по ObjectId")
+@router.get("/{doc_id}", response_model=EPCIOut, summary="Document sur ObjectId")
 async def by_id(doc_id: str = Path(..., description="Mongo ObjectId (24 hex)")):
     try:
         _id = ObjectId(doc_id)
@@ -198,7 +198,7 @@ async def by_id(doc_id: str = Path(..., description="Mongo ObjectId (24 hex)")):
 
 
 # ---------- CREATE ----------
-@router.post("/", response_model=EPCIOut, status_code=201, summary="Создать EPCI")
+@router.post("/", response_model=EPCIOut, status_code=201, summary="Créer un EPCI")
 async def create_epci(payload: EPCIIn):
     res = await db[COLL_EPCI].insert_one(payload.model_dump(exclude_none=True))
     doc = await db[COLL_EPCI].find_one({"_id": res.inserted_id})
@@ -206,7 +206,7 @@ async def create_epci(payload: EPCIIn):
 
 
 # ---------- BULK INSERT ----------
-@router.post("/bulk", response_model=List[EPCIOut], status_code=201, summary="Массовая загрузка")
+@router.post("/bulk", response_model=List[EPCIOut], status_code=201, summary="Téléchargement massif")
 async def bulk_insert(items: List[EPCIIn]):
     if not items:
         return []
@@ -218,7 +218,7 @@ async def bulk_insert(items: List[EPCIIn]):
 
 
 # ---------- PATCH ----------
-@router.patch("/{doc_id}", response_model=EPCIOut, summary="Обновить EPCI")
+@router.patch("/{doc_id}", response_model=EPCIOut, summary="Mise à jour EPCI")
 async def update_epci(doc_id: str, payload: EPCIUpdate):
     try:
         _id = ObjectId(doc_id)
@@ -235,7 +235,7 @@ async def update_epci(doc_id: str, payload: EPCIUpdate):
 
 
 # ---------- DELETE ----------
-@router.delete("/{doc_id}", status_code=204, summary="Удалить EPCI")
+@router.delete("/{doc_id}", status_code=204, summary="Supprimer EPCI")
 async def delete_epci(doc_id: str):
     try:
         _id = ObjectId(doc_id)
